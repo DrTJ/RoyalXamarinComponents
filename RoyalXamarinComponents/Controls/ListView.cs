@@ -15,6 +15,7 @@ namespace RoyalXamarinComponents.Controls
         #endregion
 
         #region Constructors
+
         public ListView()
         {
             ItemTapped += (sender, e) => 
@@ -23,15 +24,18 @@ namespace RoyalXamarinComponents.Controls
                 {
                     ItemTappedCommand?.Execute(e.Item);
                 }
+
+                SelectedItem = null;
             };
         }
+
         #endregion
 
         #region Properties
 
         public static BindableProperty ItemTappedCommandProperty = BindableProperty.Create(
             nameof(ItemTappedCommand),
-            typeof(Command<object>),
+            typeof(ICommand),
             typeof(ListView),
             propertyChanged: (bindable, oldValue, newValue) => {
                 var control = (ListView)bindable;
@@ -40,7 +44,7 @@ namespace RoyalXamarinComponents.Controls
 
         public ICommand ItemTappedCommand
         {
-            get { return (Command<object>)GetValue(ItemTappedCommandProperty); }
+            get { return (ICommand)GetValue(ItemTappedCommandProperty); }
             set { SetValue(ItemTappedCommandProperty, value); }
         }
 
