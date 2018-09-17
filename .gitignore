@@ -1,2 +1,5 @@
 RoyalXamarinLayouts/bin/
 RoyalXamarinComponents/bin/
+.vs
+packages
+RoyalXamarinComponents/obj
