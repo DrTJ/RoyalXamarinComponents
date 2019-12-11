@@ -1,55 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections;
 using Xamarin.Forms;
 
-namespace RoyalXamarinComponents.Layouts
-{
-    public class RepeaterLayout: StackLayout
-    {
+namespace RoyalXamarinComponents.Layouts {
+    public class RepeaterLayout : StackLayout {
         #region Fields
-
-        #endregion
-
-        #region Bindable properties
-
-        public static BindableProperty ItemsSourceProperty = BindableProperty.Create(
-            nameof(ItemsSource),
-            typeof(ObservableCollection<object>),
-            typeof(RepeaterLayout),
-            new ObservableCollection<object>(),
-            BindingMode.TwoWay,
-            propertyChanging: (BindableObject bindable, object oldvalue, object newvalue) => {
-                RepeaterLayout layout = (RepeaterLayout)bindable;
-                layout.ItemsSource = (ObservableCollection<object>)newvalue;
-                layout.RefreshLayouts();
-            },
-            propertyChanged: (BindableObject bindable, object oldvalue, object newvalue) => {
-                RepeaterLayout layout = (RepeaterLayout)bindable;
-                layout.ItemsSource = (ObservableCollection<object>)newvalue;
-                layout.RefreshLayouts();
-            });
-
-        public ObservableCollection<object> ItemsSource
-        {
-            get { return (ObservableCollection<object>)GetValue(ItemsSourceProperty); }
-            set { SetValue(ItemsSourceProperty, value); }
-        }
 
         #endregion
 
         #region Constructor
 
-        public RepeaterLayout()
-        {
+        public RepeaterLayout() {
         }
 
         #endregion
 
         #region Properties
+
+        public static BindableProperty ItemsSourceProperty = BindableProperty.Create(
+            nameof(ItemsSource),
+            typeof(ICollection),
+            typeof(RepeaterLayout),
+            default(ICollection),
+            propertyChanged: (BindableObject bindable, object oldvalue, object newvalue) => {
+                var layout = (RepeaterLayout)bindable;
+                layout.ItemsSource = (ICollection)newvalue;
+                layout.RefreshLayouts();
+            });
+
+        public ICollection ItemsSource {
+            get { return (ICollection)GetValue(ItemsSourceProperty); }
+            set { SetValue(ItemsSourceProperty, value); }
+        }
 
         public DataTemplate ItemTemplate { get; set; }
 
@@ -57,17 +38,30 @@ namespace RoyalXamarinComponents.Layouts
 
         #region Methods
 
-        private void RefreshLayouts()
-        {
-            this.Children.Clear();
+        private void RefreshLayouts() {
+            Children.Clear();
 
-            if (this.ItemsSource?.Any() ?? false)
-            {
-                foreach (object item in this.ItemsSource)
-                {
-                    View view = (View)this.ItemTemplate.CreateContent();
-                    view.BindingContext = item;
+            if (ItemsSource == null) {
+                return;
+            }
+
+            foreach (object item in ItemsSource) {
+                View view;
+
+                if (ItemTemplate is DataTemplateSelector selector) {
+                    var template = selector.SelectTemplate(item, this);
+                    var content = template.CreateContent();
+
+                    var contentView = content as View;
+                    var contentViewCell = content as ViewCell;
+                    view = contentView ?? contentViewCell?.View;
                 }
+                else {
+                    view = (View)ItemTemplate.CreateContent();
+                }
+
+                view.BindingContext = item;
+                Children.Add(view);
             }
         }
 
