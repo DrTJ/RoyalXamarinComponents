@@ -3,3 +3,4 @@ RoyalXamarinComponents/bin/
 .vs
 packages
 RoyalXamarinComponents/obj
+*.DS_Store
