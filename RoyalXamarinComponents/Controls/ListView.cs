@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Forms;
 
-namespace RoyalXamarinComponents.Controls
-{
-    public class ListView : Xamarin.Forms.ListView
-    {
+namespace RoyalXamarinComponents.Controls {
+    public class ListView : Xamarin.Forms.ListView {
         #region Fields
 
         private DataTemplate primaryTemplate;
@@ -20,12 +18,9 @@ namespace RoyalXamarinComponents.Controls
 
         #region Constructors
 
-        public ListView()
-        {
-            ItemTapped += (sender, e) => 
-            {
-                if (ItemTappedCommand?.CanExecute(e.Item) ?? false)
-                {
+        public ListView() {
+            ItemTapped += (sender, e) => {
+                if (ItemTappedCommand?.CanExecute(e.Item) ?? false) {
                     ItemTappedCommand?.Execute(e.Item);
                 }
 
@@ -46,8 +41,7 @@ namespace RoyalXamarinComponents.Controls
                 control.ItemTappedCommand = (ICommand)newValue;
             });
 
-        public ICommand ItemTappedCommand
-        {
+        public ICommand ItemTappedCommand {
             get { return (ICommand)GetValue(ItemTappedCommandProperty); }
             set { SetValue(ItemTappedCommandProperty, value); }
         }
@@ -55,57 +49,47 @@ namespace RoyalXamarinComponents.Controls
         public static BindableProperty UseAlternativeTemplateProperty = BindableProperty.Create(
             nameof(UseAlternativeTemplate),
             typeof(bool),
-            typeof(ListView), 
+            typeof(ListView),
             false);
 
-        public bool UseAlternativeTemplate
-        {
+        public bool UseAlternativeTemplate {
             get { return (bool)GetValue(UseAlternativeTemplateProperty); }
             set { SetValue(UseAlternativeTemplateProperty, value); }
         }
 
-        public DataTemplate PrimaryTemplate
-        {
+        public DataTemplate PrimaryTemplate {
             get => primaryTemplate;
-            set
-            {
-                if (Equals(primaryTemplate, value))
-                {
+            set {
+                if (Equals(primaryTemplate, value)) {
                     return;
                 }
 
                 primaryTemplate = value;
 
                 // Generate Selector
-                if(primaryTemplate != null && secondaryTemplate != null)
-                {
+                if (primaryTemplate != null && secondaryTemplate != null) {
                     ResetTemplateSelectorSelector();
                 }
             }
         }
 
-        public DataTemplate SecondaryTemplate
-        {
+        public DataTemplate SecondaryTemplate {
             get => secondaryTemplate;
-            set
-            {
-                if (Equals(secondaryTemplate, value))
-                {
+            set {
+                if (Equals(secondaryTemplate, value)) {
                     return;
                 }
 
                 secondaryTemplate = value;
 
                 // Generate Selector
-                if (primaryTemplate != null && secondaryTemplate != null)
-                {
+                if (primaryTemplate != null && secondaryTemplate != null) {
                     ResetTemplateSelectorSelector();
                 }
             }
         }
 
-        private void ResetTemplateSelectorSelector()
-        {
+        private void ResetTemplateSelectorSelector() {
             ItemTemplate = new AlternativeTemplateSelector(PrimaryTemplate, SecondaryTemplate);
         }
 
@@ -120,28 +104,23 @@ namespace RoyalXamarinComponents.Controls
         #endregion
     }
 
-    public class AlternativeTemplateSelector : DataTemplateSelector
-    {
+    public class AlternativeTemplateSelector : DataTemplateSelector {
         private readonly DataTemplate primaryDataTemplate;
         private readonly DataTemplate secondaryDataTemplate;
 
-        public AlternativeTemplateSelector(DataTemplate primaryDataTemplate, DataTemplate secondaryDataTemplate)
-        {
+        public AlternativeTemplateSelector(DataTemplate primaryDataTemplate, DataTemplate secondaryDataTemplate) {
             this.primaryDataTemplate = primaryDataTemplate;
             this.secondaryDataTemplate = secondaryDataTemplate;
         }
 
-        protected override DataTemplate OnSelectTemplate(object item, BindableObject container)
-        {
+        protected override DataTemplate OnSelectTemplate(object item, BindableObject container) {
             var listView = container as ListView;
             if (listView == null)
                 return null;
-            
+
             double index = 0;
-            foreach (var itemInSource in listView.ItemsSource)
-            {
-                if(Equals(itemInSource, item))
-                {
+            foreach (var itemInSource in listView.ItemsSource) {
+                if (Equals(itemInSource, item)) {
                     break;
                 }
 
